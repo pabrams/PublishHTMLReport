@@ -211,23 +211,21 @@ export class InfoTab extends Controls.BaseControl {
 					taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "tenthscriptname").then((taskAttachments)=> {
 						$.each(taskAttachments, (index, taskAttachment) => {
 							if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-
 							   var recId = taskAttachment.recordId;
 							   var timelineId = taskAttachment.timelineId;
-							   
 							   taskClient.getAttachmentContent(vsoContext.project.id, "build", build.orchestrationPlan.planId,timelineId,recId,"tenthscriptname",taskAttachment.name).then((attachementContent)=> {
 								function arrayBufferToString(buffer){
 									var newstring = '';
 									var arr = new Uint8Array(buffer);
 									var len = arr.byteLength;
 									for (var i = 0; i < len; i++) {
-									 newstring += String.fromCharCode( arr[ i ] );
-								 }
+										newstring += String.fromCharCode( arr[ i ] );
+								 	}
 									//var str = String.fromCharCode.apply(String, arr);
 									return newstring;
 								}
-								   var tenth = arrayBufferToString(attachementContent);
-								   setTimeout(function() {
+								var tenth = arrayBufferToString(attachementContent);
+								setTimeout(function() {
 									var s = document.createElement("script");
 									s.innerHTML = tenth;
 									s.async = false;
