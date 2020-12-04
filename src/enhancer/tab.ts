@@ -1,9 +1,7 @@
 import Controls = require("VSS/Controls");
-import VSS_Service = require("VSS/Service");
 import TFS_Build_Contracts = require("TFS/Build/Contracts");
 import TFS_Build_Extension_Contracts = require("TFS/Build/ExtensionContracts");
 import DT_Client = require("TFS/DistributedTask/TaskRestClient");
-import { data } from "jquery";
 
 function arrayBufferToString(buffer){
 	var arr = new Uint8Array(buffer);
@@ -22,6 +20,24 @@ function arrayBufferToString2(buffer){
    return newstring;
 }
 
+function setStupidTimeout(someStupidString, attachementContent){
+	setTimeout(function() {
+		var s = document.createElement("script");
+		s.innerHTML = arrayBufferToString(attachementContent);
+		s.async = false;
+		document.getElementById(someStupidString).appendChild(s)
+	}, 1000);
+}
+
+function setStupidTimeout2(someStupidString, attachementContent){
+	setTimeout(function() {
+		var s = document.createElement("script");
+		s.innerHTML = arrayBufferToString2(attachementContent);
+		s.async = false;
+		document.getElementById(someStupidString).appendChild(s)
+	}, 1000);
+}
+
 export class InfoTab extends Controls.BaseControl {	
 	constructor() {
 		super();
@@ -31,26 +47,31 @@ export class InfoTab extends Controls.BaseControl {
 		super.initialize();
 		// Get configuration that's shared between extension and the extension host
 		var sharedConfig: TFS_Build_Extension_Contracts.IBuildResultsViewExtensionConfig = VSS.getConfiguration();
-		var vsoContext = VSS.getWebContext();
+		let projectId = VSS.getWebContext().project.id;
 		if(sharedConfig) {
 			// register your extension with host through callback
 			sharedConfig.onBuildChanged((build: TFS_Build_Contracts.Build) => {
 				var taskClient = DT_Client.getClient();
 				taskClient.getPlanAttachments(
-					vsoContext.project.id, 
+					projectId, 
 					"build", 
 					build.orchestrationPlan.planId, 
 					"firstscriptname"
 				).then((taskAttachments)=> {
 					$.each(taskAttachments, (index, taskAttachment) => {
 						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							var recId = taskAttachment.recordId;
-							var timelineId = taskAttachment.timelineId;
-							taskClient.getAttachmentContent(vsoContext.project.id, "build", build.orchestrationPlan.planId,timelineId,recId,"firstscriptname",taskAttachment.name).then((attachementContent)=> {
-								var first = arrayBufferToString(attachementContent);
+							taskClient.getAttachmentContent(
+								projectId, 
+								"build", 
+								build.orchestrationPlan.planId,
+								taskAttachment.timelineId,
+								taskAttachment.recordId,
+								"firstscriptname",
+								taskAttachment.name
+							).then((attachementContent)=> {
 								document.body.style.overflow = "visible";
 								var s = document.createElement("script");
-								s.innerHTML = first;
+								s.innerHTML = arrayBufferToString(attachementContent);
 								s.async = false;
 								document.getElementById("firstscript").appendChild(s);
 							});
@@ -58,238 +79,232 @@ export class InfoTab extends Controls.BaseControl {
 					});
 				});
 				taskClient.getPlanAttachments(
-					vsoContext.project.id, 
+					projectId, 
 					"build", 
 					build.orchestrationPlan.planId, 
 					"secondscriptname"
 				).then((taskAttachments)=> {
 					$.each(taskAttachments, (index, taskAttachment) => {
 						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							var recId = taskAttachment.recordId;
-							var timelineId = taskAttachment.timelineId;
 							taskClient.getAttachmentContent(
-								vsoContext.project.id, 
+								projectId, 
 								"build", 
 								build.orchestrationPlan.planId,
-								timelineId,
-								recId,
+								taskAttachment.timelineId,
+								taskAttachment.recordId,
 								"secondscriptname",
 								taskAttachment.name
 							).then((attachementContent)=> {
-								var second = arrayBufferToString(attachementContent);
-								setTimeout(function() {
-									var s = document.createElement("script");
-									s.innerHTML = second;
-									s.async = false;
-									document.getElementById("secondscript").appendChild(s)
-								}, 1000);
+								setStupidTimeout("secondscript", attachementContent);
 							});
 						}
 					});
 				});
-				taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "fourthscriptname").then((taskAttachments)=> {
+				taskClient.getPlanAttachments(
+					projectId, 
+					"build", 
+					build.orchestrationPlan.planId, 
+					"fourthscriptname"
+				).then((taskAttachments)=> {
 					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-
-							var recId = taskAttachment.recordId;
-							var timelineId = taskAttachment.timelineId;
-							
-							taskClient.getAttachmentContent(vsoContext.project.id, "build", build.orchestrationPlan.planId,timelineId,recId,"fourthscriptname",taskAttachment.name).then((attachementContent)=> {
-								var fourth = arrayBufferToString(attachementContent);
-								setTimeout(function() {
-									var s = document.createElement("script");
-									s.innerHTML = fourth;
-									s.async = false;
-									document.getElementById("fourthscript").appendChild(s)
-								}, 1000);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "fifthscriptname").then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-
-							var recId = taskAttachment.recordId;
-							var timelineId = taskAttachment.timelineId;
-							
-							taskClient.getAttachmentContent(vsoContext.project.id, "build", build.orchestrationPlan.planId,timelineId,recId,"fifthscriptname",taskAttachment.name).then((attachementContent)=> {
-								var fifth = arrayBufferToString(attachementContent);
-								setTimeout(function() {
-									var s = document.createElement("script");
-									s.innerHTML = fifth;
-									s.async = false;
-									document.getElementById("fifthscript").appendChild(s)
-								}, 1000);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "sixthscriptname").then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-
-							var recId = taskAttachment.recordId;
-							var timelineId = taskAttachment.timelineId;
-							
-							taskClient.getAttachmentContent(vsoContext.project.id, "build", build.orchestrationPlan.planId,timelineId,recId,"sixthscriptname",taskAttachment.name).then((attachementContent)=> {
-								var sixth = arrayBufferToString(attachementContent);
-								setTimeout(function() {
-									var s = document.createElement("script");
-									s.innerHTML = sixth;
-									s.async = false;
-									document.getElementById("sixthscript").appendChild(s)
-								}, 1000);
-							});
-							
-						}
-					});
-				});
-				taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "seventhscriptname").then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-
-							var recId = taskAttachment.recordId;
-							var timelineId = taskAttachment.timelineId;
-							
-							taskClient.getAttachmentContent(vsoContext.project.id, "build", build.orchestrationPlan.planId,timelineId,recId,"seventhscriptname",taskAttachment.name).then((attachementContent)=> {
-								var seventh = arrayBufferToString(attachementContent);
-								setTimeout(function() {
-									var s = document.createElement("script");
-									s.innerHTML = seventh;
-									s.async = false;
-									document.getElementById("seventhscript").appendChild(s)
-								}, 1000);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "ninthscriptname").then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							var recId = taskAttachment.recordId;
-							var timelineId = taskAttachment.timelineId;
+						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {							
 							taskClient.getAttachmentContent(
-								vsoContext.project.id, 
+								projectId, 
 								"build", 
 								build.orchestrationPlan.planId,
-								timelineId,
-								recId,
+								taskAttachment.timelineId,
+								taskAttachment.recordId,
+								"fourthscriptname",
+								taskAttachment.name
+							).then((attachementContent)=> {
+								setStupidTimeout("fourthscript", attachementContent);
+							});
+						}
+					});
+				});
+				taskClient.getPlanAttachments(
+					projectId, 
+					"build", 
+					build.orchestrationPlan.planId, 
+					"fifthscriptname"
+				).then((taskAttachments)=> {
+					$.each(taskAttachments, (index, taskAttachment) => {
+						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
+							taskClient.getAttachmentContent(
+								projectId, 
+								"build", 
+								build.orchestrationPlan.planId,
+								taskAttachment.timelineId,
+								taskAttachment.recordId,
+								"fifthscriptname",
+								taskAttachment.name
+							).then((attachementContent)=> {
+								setStupidTimeout("fifthscript", attachementContent);
+							});
+						}
+					});
+				});
+				taskClient.getPlanAttachments(
+					projectId, 
+					"build", 
+					build.orchestrationPlan.planId, 
+					"sixthscriptname"
+				).then((taskAttachments)=> {
+					$.each(taskAttachments, (index, taskAttachment) => {
+						if (taskAttachment._links && 
+							taskAttachment._links.self && 
+							taskAttachment._links.self.href
+						) {
+							taskClient.getAttachmentContent(
+								projectId, 
+								"build", 
+								build.orchestrationPlan.planId,
+								taskAttachment.timelineId,
+								taskAttachment.recordId,
+								"sixthscriptname",
+								taskAttachment.name
+							).then((attachementContent)=> {
+								setStupidTimeout("sixthscript", attachementContent);
+							});
+						}
+					});
+				});
+				taskClient.getPlanAttachments(
+					projectId, 
+					"build", 
+					build.orchestrationPlan.planId, 
+					"seventhscriptname"
+				).then((taskAttachments)=> {
+					$.each(taskAttachments, (index, taskAttachment) => {
+						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
+							taskClient.getAttachmentContent(
+								projectId, 
+								"build", 
+								build.orchestrationPlan.planId,
+								taskAttachment.timelineId,
+								taskAttachment.recordId,
+								"seventhscriptname",
+								taskAttachment.name
+							).then((attachementContent)=> {
+								setStupidTimeout("seventhscript", attachementContent);
+							});
+						}
+					});
+				});
+				taskClient.getPlanAttachments(
+					projectId, 
+					"build", 
+					build.orchestrationPlan.planId, 
+					"ninthscriptname"
+				).then((taskAttachments)=> {
+					$.each(taskAttachments, (index, taskAttachment) => {
+						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
+							taskClient.getAttachmentContent(
+								projectId, 
+								"build", 
+								build.orchestrationPlan.planId,
+								taskAttachment.timelineId,
+								taskAttachment.recordId,
 								"ninthscriptname",
 								taskAttachment.name
 							).then((attachementContent)=> {
-								var ninth = arrayBufferToString2(attachementContent);
-								setTimeout(function() {
-									var s = document.createElement("script");
-									s.innerHTML = ninth;
-									s.async = false;
-									document.getElementById("ninthscript").appendChild(s)
-								}, 1000);
+								setStupidTimeout("ninthscript", attachementContent);
 							});
 						}
 					});
 				});
-				taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "tenthscriptname").then((taskAttachments)=> {
+				taskClient.getPlanAttachments(
+					projectId, 
+					"build", 
+					build.orchestrationPlan.planId, 
+					"tenthscriptname"
+				).then((taskAttachments)=> {
 					$.each(taskAttachments, (index, taskAttachment) => {
 						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							var recId = taskAttachment.recordId;
-							var timelineId = taskAttachment.timelineId;
 							taskClient.getAttachmentContent(
-								vsoContext.project.id, 
+								projectId, 
 								"build", 
 								build.orchestrationPlan.planId,
-								timelineId,
-								recId,
+								taskAttachment.timelineId,
+								taskAttachment.recordId,
 								"tenthscriptname",
 								taskAttachment.name
 							).then((attachementContent)=> {
-								var tenth = arrayBufferToString2(attachementContent);
-								setTimeout(function() {
-									var s = document.createElement("script");
-									s.innerHTML = tenth;
-									s.async = false;
-									document.getElementById("tenthscript").appendChild(s)
-								}, 1000);
+								setStupidTimeout2("tenthscript", attachementContent);
 							});
-							
 						}
 					});
 				});
-				taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "twefthscriptname").then((taskAttachments)=> {
+				taskClient.getPlanAttachments(
+					projectId, 
+					"build", 
+					build.orchestrationPlan.planId, 
+					"twefthscriptname"
+				).then((taskAttachments)=> {
 					$.each(taskAttachments, (index, taskAttachment) => {
 						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							var recId = taskAttachment.recordId;
-							var timelineId = taskAttachment.timelineId;
 							taskClient.getAttachmentContent(
-								vsoContext.project.id, 
+								projectId, 
 								"build", 
 								build.orchestrationPlan.planId,
-								timelineId,
-								recId,
+								taskAttachment.timelineId,
+								taskAttachment.recordId,
 								"twefthscriptname",
 								taskAttachment.name
 							).then((attachementContent)=> {
-								var tenth = arrayBufferToString2(attachementContent);
-								setTimeout(function() {
-									var s = document.createElement("script");
-									s.innerHTML = tenth;
-									s.async = false;
-									document.getElementById("twefthscriptname").appendChild(s)
-								}, 1000);
+								setStupidTimeout2("twefthscript", attachementContent);
 							});
 						}
 					});
 				});
-				taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "replacedhtml").then((taskAttachments)=> {
+				taskClient.getPlanAttachments(
+					projectId, 
+					"build", 
+					build.orchestrationPlan.planId, 
+					"replacedhtml"
+				).then((taskAttachments)=> {
 					$.each(taskAttachments, (index, taskAttachment) => {
 						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							var recId = taskAttachment.recordId;
-							var timelineId = taskAttachment.timelineId;
-							
 							taskClient.getAttachmentContent(
-								vsoContext.project.id, 
+								projectId, 
 								"build", 
 								build.orchestrationPlan.planId,
-								timelineId,
-								recId,
+								taskAttachment.timelineId,
+								taskAttachment.recordId,
 								"replacedhtml",
 								taskAttachment.name
 							).then((attachementContent)=> {
-								var newhtml = arrayBufferToString2(attachementContent);
 								document.body.style.overflow = "visible";
-								document.getElementById("wrapper").innerHTML = newhtml;
+								document.getElementById("wrapper").innerHTML = arrayBufferToString2(attachementContent);
 							});
 						}
 					});
 				});
-				taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "eleventhscriptname").then((taskAttachments)=> {
+				taskClient.getPlanAttachments(
+					projectId, 
+					"build", 
+					build.orchestrationPlan.planId, 
+					"eleventhscriptname"
+				).then((taskAttachments)=> {
 					$.each(taskAttachments, (index, taskAttachment) => {
 						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							var recId = taskAttachment.recordId;
-							var timelineId = taskAttachment.timelineId;
 							taskClient.getAttachmentContent(
-								vsoContext.project.id, 
+								projectId, 
 								"build", 
 								build.orchestrationPlan.planId,
-								timelineId,
-								recId,
+								taskAttachment.timelineId,
+								taskAttachment.recordId,
 								"eleventhscriptname",
 								taskAttachment.name
 							).then((attachementContent)=> {
-								var eleventh = arrayBufferToString(attachementContent);
-								setTimeout(function() {
-									var s = document.createElement("script");
-									s.innerHTML = eleventh;
-									s.async = false;
-									document.getElementById("eleventhscript").appendChild(s);
-								}, 1000);
+								setStupidTimeout("eleventhscript", attachementContent);
 							});
 						}
 					});
 				});
 			});
-		}
-	}
+		} // if(sharedConfig) 
+	} // initialize
 }
 
 InfoTab.enhance(InfoTab, $(".wrapper"),{});
