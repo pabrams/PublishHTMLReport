@@ -38,6 +38,57 @@ function setStupidTimeout2(someStupidString, attachementContent){
 	}, 1000);
 }
 
+function renderAttachmentContent(taskClient, build, projectId, attachmentType, scriptName1, scriptName2){
+	taskClient.getPlanAttachments(
+		projectId, 
+		attachmentType, 
+		build.orchestrationPlan.planId, 
+		scriptName1
+	).then((taskAttachments)=> {
+		$.each(taskAttachments, (index, taskAttachment) => {
+			if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
+				taskClient.getAttachmentContent(
+					projectId, 
+					attachmentType, 
+					build.orchestrationPlan.planId,
+					taskAttachment.timelineId,
+					taskAttachment.recordId,
+					scriptName1,
+					taskAttachment.name
+				).then((attachementContent)=> {
+					setStupidTimeout(scriptName2, attachementContent);
+				});
+			}
+		});
+	});
+}
+
+function renderAttachmentContent2(taskClient, build, projectId, attachmentType, scriptName1, scriptName2){
+	taskClient.getPlanAttachments(
+		projectId, 
+		attachmentType, 
+		build.orchestrationPlan.planId, 
+		scriptName1
+	).then((taskAttachments)=> {
+		$.each(taskAttachments, (index, taskAttachment) => {
+			if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
+				taskClient.getAttachmentContent(
+					projectId, 
+					attachmentType, 
+					build.orchestrationPlan.planId,
+					taskAttachment.timelineId,
+					taskAttachment.recordId,
+					scriptName1,
+					taskAttachment.name
+				).then((attachementContent)=> {
+					document.body.style.overflow = "visible";
+					setStupidTimeout2(scriptName2, attachementContent);
+				});
+			}
+		});
+	});
+}
+
 export class InfoTab extends Controls.BaseControl {	
 	constructor() {
 		super();
@@ -52,255 +103,41 @@ export class InfoTab extends Controls.BaseControl {
 			// register your extension with host through callback
 			sharedConfig.onBuildChanged((build: TFS_Build_Contracts.Build) => {
 				var taskClient = DT_Client.getClient();
-				taskClient.getPlanAttachments(
-					projectId, 
-					"build", 
-					build.orchestrationPlan.planId, 
-					"firstscriptname"
-				).then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							taskClient.getAttachmentContent(
-								projectId, 
-								"build", 
-								build.orchestrationPlan.planId,
-								taskAttachment.timelineId,
-								taskAttachment.recordId,
-								"firstscriptname",
-								taskAttachment.name
-							).then((attachementContent)=> {
-								document.body.style.overflow = "visible";
-								var s = document.createElement("script");
-								s.innerHTML = arrayBufferToString(attachementContent);
-								s.async = false;
-								document.getElementById("firstscript").appendChild(s);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(
-					projectId, 
-					"build", 
-					build.orchestrationPlan.planId, 
-					"secondscriptname"
-				).then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							taskClient.getAttachmentContent(
-								projectId, 
-								"build", 
-								build.orchestrationPlan.planId,
-								taskAttachment.timelineId,
-								taskAttachment.recordId,
-								"secondscriptname",
-								taskAttachment.name
-							).then((attachementContent)=> {
-								setStupidTimeout("secondscript", attachementContent);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(
-					projectId, 
-					"build", 
-					build.orchestrationPlan.planId, 
-					"fourthscriptname"
-				).then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {							
-							taskClient.getAttachmentContent(
-								projectId, 
-								"build", 
-								build.orchestrationPlan.planId,
-								taskAttachment.timelineId,
-								taskAttachment.recordId,
-								"fourthscriptname",
-								taskAttachment.name
-							).then((attachementContent)=> {
-								setStupidTimeout("fourthscript", attachementContent);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(
-					projectId, 
-					"build", 
-					build.orchestrationPlan.planId, 
-					"fifthscriptname"
-				).then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							taskClient.getAttachmentContent(
-								projectId, 
-								"build", 
-								build.orchestrationPlan.planId,
-								taskAttachment.timelineId,
-								taskAttachment.recordId,
-								"fifthscriptname",
-								taskAttachment.name
-							).then((attachementContent)=> {
-								setStupidTimeout("fifthscript", attachementContent);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(
-					projectId, 
-					"build", 
-					build.orchestrationPlan.planId, 
-					"sixthscriptname"
-				).then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && 
-							taskAttachment._links.self && 
-							taskAttachment._links.self.href
-						) {
-							taskClient.getAttachmentContent(
-								projectId, 
-								"build", 
-								build.orchestrationPlan.planId,
-								taskAttachment.timelineId,
-								taskAttachment.recordId,
-								"sixthscriptname",
-								taskAttachment.name
-							).then((attachementContent)=> {
-								setStupidTimeout("sixthscript", attachementContent);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(
-					projectId, 
-					"build", 
-					build.orchestrationPlan.planId, 
-					"seventhscriptname"
-				).then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							taskClient.getAttachmentContent(
-								projectId, 
-								"build", 
-								build.orchestrationPlan.planId,
-								taskAttachment.timelineId,
-								taskAttachment.recordId,
-								"seventhscriptname",
-								taskAttachment.name
-							).then((attachementContent)=> {
-								setStupidTimeout("seventhscript", attachementContent);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(
-					projectId, 
-					"build", 
-					build.orchestrationPlan.planId, 
-					"ninthscriptname"
-				).then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							taskClient.getAttachmentContent(
-								projectId, 
-								"build", 
-								build.orchestrationPlan.planId,
-								taskAttachment.timelineId,
-								taskAttachment.recordId,
-								"ninthscriptname",
-								taskAttachment.name
-							).then((attachementContent)=> {
-								setStupidTimeout("ninthscript", attachementContent);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(
-					projectId, 
-					"build", 
-					build.orchestrationPlan.planId, 
-					"tenthscriptname"
-				).then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							taskClient.getAttachmentContent(
-								projectId, 
-								"build", 
-								build.orchestrationPlan.planId,
-								taskAttachment.timelineId,
-								taskAttachment.recordId,
-								"tenthscriptname",
-								taskAttachment.name
-							).then((attachementContent)=> {
-								setStupidTimeout2("tenthscript", attachementContent);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(
-					projectId, 
-					"build", 
-					build.orchestrationPlan.planId, 
-					"twefthscriptname"
-				).then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							taskClient.getAttachmentContent(
-								projectId, 
-								"build", 
-								build.orchestrationPlan.planId,
-								taskAttachment.timelineId,
-								taskAttachment.recordId,
-								"twefthscriptname",
-								taskAttachment.name
-							).then((attachementContent)=> {
-								setStupidTimeout2("twefthscript", attachementContent);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(
-					projectId, 
-					"build", 
-					build.orchestrationPlan.planId, 
-					"replacedhtml"
-				).then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							taskClient.getAttachmentContent(
-								projectId, 
-								"build", 
-								build.orchestrationPlan.planId,
-								taskAttachment.timelineId,
-								taskAttachment.recordId,
-								"replacedhtml",
-								taskAttachment.name
-							).then((attachementContent)=> {
-								document.body.style.overflow = "visible";
-								document.getElementById("wrapper").innerHTML = arrayBufferToString2(attachementContent);
-							});
-						}
-					});
-				});
-				taskClient.getPlanAttachments(
-					projectId, 
-					"build", 
-					build.orchestrationPlan.planId, 
-					"eleventhscriptname"
-				).then((taskAttachments)=> {
-					$.each(taskAttachments, (index, taskAttachment) => {
-						if (taskAttachment._links && taskAttachment._links.self && taskAttachment._links.self.href) {
-							taskClient.getAttachmentContent(
-								projectId, 
-								"build", 
-								build.orchestrationPlan.planId,
-								taskAttachment.timelineId,
-								taskAttachment.recordId,
-								"eleventhscriptname",
-								taskAttachment.name
-							).then((attachementContent)=> {
-								setStupidTimeout("eleventhscript", attachementContent);
-							});
-						}
-					});
+
+				var list1 = [
+					{name1: "firstscriptname", name2: "firstscript"},
+					{name1: "fourthscriptname", name2: "fourthscript"},
+					{name1: "fifthscriptname", name2: "fifthscript"},
+					{name1: "sixthscriptname", name2: "sixthscript"},
+					{name1: "seventhscriptname", name2: "seventhscript"},
+					{name1: "ninthscriptname", name2: "ninthscript"},
+					{name1: "eleventhscriptname", name2: "eleventhscript"},
+				];				
+				var list2 = [
+					{name1: "tenthscriptname", name2: "tenthscript"},
+					{name1: "twefthscriptname", name2: "twefthscript"},
+					{name1: "replacedhtml", name2: "wrapper"},
+					{name1: "eleventhscriptname", name2: "eleventhscript"},
+				];
+				list1.forEach(function (thing) {
+					renderAttachmentContent(
+						taskClient,
+						build,
+						projectId,
+						"build",
+						thing.name1,
+						thing.name2
+					);
+				}); 
+				list2.forEach(function (thing) {
+					renderAttachmentContent2(
+						taskClient,
+						build,
+						projectId,
+						"build",
+						thing.name1,
+						thing.name2
+					);
 				});
 			});
 		} // if(sharedConfig) 

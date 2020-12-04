@@ -80,7 +80,7 @@
             "addressable": true
         },
         {
-            "path": "content/css",
+            "path": "css",
             "addressable": true
         },
         {
